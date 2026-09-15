@@ -1,0 +1,8 @@
+# Fichiers de test et outils locaux
+.claude/
+.playwright-mcp/
+
+# Fichiers système
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commande confirmée — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="commande">
+  <header data-header></header>
+
+  <main class="section">
+    <div class="wrap" id="contenu"></div>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      var racine = document.getElementById("contenu");
+      var cmd = A.commande(A.param("n"));
+
+      if (!cmd) {
+        racine.innerHTML = '<div class="empty"><h2>Commande introuvable</h2><p>Ce reçu n\'existe pas sur cet appareil.</p>' +
+          '<a class="btn btn--primary" href="produits.html">Voir les produits</a></div>';
+        return;
+      }
+
+      var lienVendeur = A.lienWhatsApp(A.messageCommande(cmd));
+
+      racine.innerHTML =
+        '<article class="receipt">' +
+          '<div class="receipt__head">' +
+            '<div class="okmark">' + A.I.check + '</div>' +
+            '<h1>Merci ' + A.esc(cmd.client.nom.split(" ")[0]) + ', votre commande est enregistrée</h1>' +
+            '<p>La coopérative prépare vos produits et vous appelle au ' + A.esc(cmd.client.telephone) + '.</p>' +
+          '</div>' +
+          '<div class="receipt__body">' +
+            '<div class="receipt__meta">' +
+              '<div><small>N° de commande</small><b>' + A.esc(cmd.numero) + '</b></div>' +
+              '<div><small>Date</small><b>' + A.esc(cmd.date) + '</b></div>' +
+              '<div><small>Paiement</small><b>' + A.esc(cmd.paiement.moyen) + '</b></div>' +
+            '</div>' +
+
+            '<div id="notif"></div>' +
+
+            '<div class="tablewrap"><table>' +
+              '<thead><tr><th>Produit</th><th>Quantité</th><th>Tarif</th><th>Montant</th></tr></thead><tbody>' +
+              cmd.lignes.map(function (l) {
+                return '<tr><td><b>' + A.esc(l.nom) + '</b></td><td>' + l.qte + ' kg</td><td>' + A.fcfa(l.prixUnitaire) +
+                  '/kg <span class="typebadge typebadge--' + l.type + '">' + A.nomType(l.type) + '</span></td><td>' + A.fcfa(l.total) + '</td></tr>';
+              }).join("") +
+              '</tbody><tfoot>' +
+                (cmd.economie > 0 ? '<tr><td colspan="3">Remise quantité incluse</td><td style="color:var(--tomate)">−' + A.fcfa(cmd.economie) + '</td></tr>' : "") +
+                '<tr><td colspan="3">' + A.esc(cmd.livraison) + '</td><td>' + (cmd.fraisLivraison ? A.fcfa(cmd.fraisLivraison) : "Gratuite") + '</td></tr>' +
+                '<tr><td colspan="3">Total payé</td><td>' + A.fcfa(cmd.total) + '</td></tr>' +
+              '</tfoot></table></div>' +
+
+            '<div class="notice' + (cmd.paiement.reel ? " notice--warn" : "") + '">' + A.I.shield + '<span>' +
+              (cmd.paiement.reel ?
+                '<b>Paiement Wave déclaré.</b> La coopérative vérifie la réception dans son espace Wave Business avant d\'expédier.' :
+                '<b>' + A.esc(cmd.paiement.statut) + '.</b> Référence de transaction : ' + A.esc(cmd.paiement.reference) + (cmd.paiement.numero ? ' — depuis le ' + A.esc(cmd.paiement.numero) : '')) +
+            '</span></div>' +
+
+            '<div class="notice">' + A.I.pin + '<span><b>Livraison :</b> ' + A.esc(cmd.client.localite) + (cmd.client.adresse ? ", " + A.esc(cmd.client.adresse) : "") +
+              (cmd.client.note ? '<br><b>Vos précisions :</b> ' + A.esc(cmd.client.note) : "") + '</span></div>' +
+
+            '<div class="receipt__actions">' +
+              '<a class="btn btn--wa btn--lg" href="' + lienVendeur + '" target="_blank" rel="noopener">' + A.I.wa + ' Envoyer la commande sur WhatsApp</a>' +
+              '<button class="btn btn--outline btn--lg" type="button" onclick="window.print()">Imprimer le reçu</button>' +
+              '<a class="btn btn--ghost btn--lg" href="produits.html">Continuer mes achats</a>' +
+            '</div>' +
+          '</div>' +
+        '</article>';
+
+      var zone = document.getElementById("notif");
+      function afficher(etat) {
+        var msg = {
+          envoi: ['', 'Envoi de la commande à la coopérative sur WhatsApp…'],
+          envoye: ['', '<b>La coopérative a été prévenue sur WhatsApp.</b> Pour lui écrire directement, utilisez le bouton vert ci-dessous.'],
+          echec: [' notice--warn', '<b>La notification automatique n\'a pas pu partir.</b> Envoyez la commande avec le bouton WhatsApp ci-dessous.'],
+          inactif: [' notice--warn', '<b>Dernière étape :</b> envoyez votre commande à la coopérative avec le bouton WhatsApp ci-dessous, pour qu\'elle la prépare.']
+        }[etat];
+        zone.innerHTML = '<div class="notice' + msg[0] + '">' + A.I.wa + '<span>' + msg[1] + '</span></div>';
+      }
+
+      if (cmd.notifie) {
+        afficher(cmd.notifie === "envoye" ? "envoye" : "inactif");
+      } else if (C.callmebot && C.callmebot.apiKey) {
+        afficher("envoi");
+        A.notifierVendeur(cmd).then(function (etat) {
+          A.majCommande(cmd.numero, { notifie: etat });
+          afficher(etat);
+        });
+      } else {
+        A.majCommande(cmd.numero, { notifie: "inactif" });
+        afficher("inactif");
+      }
+    })();
+  </script>
+</body>
+</html>

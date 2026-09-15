@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nous contacter — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="contact">
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Nous contacter</li></ol></nav>
+      <span class="crumbs__title">Nous contacter</span>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <p class="head__kicker">Une question, une grosse commande ?</p>
+          <h1 class="head__title">Parlons-en</h1>
+          <p class="head__lead">Le plus rapide est WhatsApp : une productrice vous répond pendant les heures d'ouverture.</p>
+        </div>
+      </div>
+
+      <div class="contact">
+        <div>
+          <div class="contact__cards" id="cards"></div>
+          <div class="map"><iframe id="map" title="Carte : emplacement de la coopérative" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        </div>
+
+        <form class="panel" id="form" novalidate>
+          <div class="panel__head"><h2>Écrire à la coopérative</h2></div>
+          <div class="fields">
+            <div class="field"><label for="nom">Nom</label><input id="nom" required autocomplete="name"></div>
+            <div class="field"><label for="profil">Vous êtes</label>
+              <select id="profil"><option>Un ménage</option><option>Détaillant(e)</option><option>Grossiste</option><option>Restaurant / maquis</option><option>Autre</option></select>
+            </div>
+            <div class="field field--full"><label for="sujet">Sujet</label>
+              <select id="sujet"><option>Demande de prix</option><option>Commande en gros</option><option>Disponibilité d'un produit</option><option>Livraison</option><option>Partenariat</option></select>
+            </div>
+            <div class="field field--full"><label for="message">Message</label><textarea id="message" rows="6" required placeholder="Ex. Je cherche 200 kg de manioc chaque semaine pour mon atelier d'attiéké."></textarea></div>
+          </div>
+          <button class="btn btn--wa btn--lg btn--block" type="submit" style="margin-top:18px" id="envoyer"></button>
+          <p class="modal__note" style="margin-top:10px">Votre message s'ouvre dans WhatsApp, prêt à envoyer.</p>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      document.getElementById("cards").innerHTML =
+        '<a class="ccard" href="' + A.lienWhatsApp("Bonjour " + C.nom + " !") + '" target="_blank" rel="noopener"><span class="ccard__ico" style="background:#25d366;color:#fff">' + A.I.wa + '</span><span><b>WhatsApp</b><span>' + A.esc(C.telephoneAffiche) + '</span></span></a>' +
+        '<a class="ccard" href="tel:+' + C.whatsapp + '"><span class="ccard__ico">' + A.I.tel + '</span><span><b>Téléphone</b><span>' + A.esc(C.telephoneAffiche) + '</span></span></a>' +
+        '<a class="ccard" href="mailto:' + A.esc(C.email) + '"><span class="ccard__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span><b>E-mail</b><span>' + A.esc(C.email) + '</span></span></a>' +
+        '<div class="ccard"><span class="ccard__ico">' + A.I.pin + '</span><span><b>Magasin de la coopérative</b><span>' + A.esc(C.adresse) + '<br>' + A.esc(C.horaires) + '</span></span></div>';
+
+      document.getElementById("map").src = "https://maps.google.com/maps?q=" + encodeURIComponent(C.carteRecherche) + "&z=12&output=embed";
+      document.getElementById("envoyer").innerHTML = A.I.wa + " Envoyer sur WhatsApp";
+
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var nom = document.getElementById("nom"), msg = document.getElementById("message");
+        if (!nom.value.trim()) { nom.focus(); A.toast("Indiquez votre nom.", "erreur"); return; }
+        if (!msg.value.trim()) { msg.focus(); A.toast("Écrivez votre message.", "erreur"); return; }
+        var texte = "Bonjour " + C.nom + ",\n\n" +
+          "*" + document.getElementById("sujet").value + "*\n" +
+          msg.value.trim() + "\n\n" +
+          "— " + nom.value.trim() + " (" + document.getElementById("profil").value + ")";
+        window.open(A.lienWhatsApp(texte), "_blank", "noopener");
+      });
+    })();
+  </script>
+</body>
+</html>

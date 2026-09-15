@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Produit — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="produits">
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol id="crumbs"><li><a href="index.html">Accueil</a></li><li><a href="produits.html">Nos produits</a></li></ol></nav>
+    </div>
+  </div>
+
+  <main>
+    <section class="section">
+      <div class="wrap" id="fiche"></div>
+    </section>
+    <section class="section section--tint">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Complétez votre panier</p>
+            <h2 class="head__title">Vous aimerez aussi</h2>
+          </div>
+        </div>
+        <div class="grid" id="autres"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      var p = A.produit(A.param("id")) || window.AVEC_PRODUITS[0];
+      var qte = C.seuils.menage;
+      var dejaDansPanier = A.panier().filter(function (l) { return l.id === p.id; })[0];
+      if (dejaDansPanier) qte = dejaDansPanier.qte;
+
+      document.title = p.nom + " — " + C.nom;
+      document.getElementById("crumbs").insertAdjacentHTML("beforeend", '<li aria-current="page">' + A.esc(p.nom) + '</li>');
+      var cat = A.categorie(p.categorie);
+
+      function rendre() {
+        var dispo = A.estDisponible(p.id);
+        var el = document.getElementById("fiche");
+        el.innerHTML =
+          '<div class="pdp">' +
+            '<div class="pdp__media">' + A.photoProduit(p) +
+              '<span class="dispo ' + (dispo ? "dispo--on" : "dispo--off") + '" id="badge-dispo">' + (dispo ? "Disponible" : "Indisponible") + '</span></div>' +
+            '<div>' +
+              '<a class="pdp__cat" href="produits.html?categorie=' + p.categorie + '">' + A.esc(cat ? cat.nom : "") + '</a>' +
+              '<h1>' + A.esc(p.nom) + '</h1>' +
+              '<p class="pdp__lead">' + A.esc(p.resume) + '</p>' +
+
+              '<table class="pricetable" aria-label="Prix au kilo selon le type de client"><thead><tr><th>Type de client</th><th>Quantité</th><th>Prix / kg</th></tr></thead><tbody>' +
+                A.TYPES.map(function (t) {
+                  var r = A.remise(p, t.id);
+                  return '<tr data-row="' + t.id + '"><td>' + t.nom + '</td><td>' + A.plage(t.id) + '</td><td>' + A.fcfa(p.prix[t.id]) +
+                    (r > 0 ? '<span class="save">−' + r + '%</span>' : "") + '</td></tr>';
+                }).join("") +
+              '</tbody></table>' +
+
+              (dispo ?
+                '<div class="buybox">' +
+                  '<div><div class="buybox__label" style="margin-bottom:10px">Vous achetez en tant que</div>' + A.selecteur("type-" + p.id, qte) + '</div>' +
+                  '<div class="buybox__total"><div><small>Total pour <span id="lbl-qte"></span></small><strong id="total"></strong></div>' +
+                    '<div style="text-align:right"><small id="lbl-pu"></small><small id="lbl-eco" style="color:var(--tomate);font-weight:700"></small></div></div>' +
+                  '<div class="buybox__cta">' +
+                    '<button class="btn btn--primary btn--lg" type="button" id="btn-ajouter">' + A.I.cart + ' Ajouter au panier</button>' +
+                    '<a class="btn btn--wa btn--lg" id="btn-wa" target="_blank" rel="noopener">' + A.I.wa + ' Commander sur WhatsApp</a>' +
+                  '</div>' +
+                '</div>'
+              :
+                '<div class="offnote">Ce produit est épuisé pour le moment. La prochaine récolte arrive bientôt : écrivez-nous pour être prévenu.</div>' +
+                '<p style="margin-top:14px"><a class="btn btn--wa" target="_blank" rel="noopener" href="' +
+                  A.lienWhatsApp("Bonjour, prévenez-moi quand " + p.nom + " sera de nouveau disponible.") + '">' + A.I.wa + ' Être prévenu sur WhatsApp</a></p>'
+              ) +
+
+              '<dl class="facts">' +
+                '<div><dt>Description</dt><dd>' + A.esc(p.description) + '</dd></div>' +
+                '<div><dt>Conservation</dt><dd>' + A.esc(p.conservation) + '</dd></div>' +
+                '<div><dt>Saison</dt><dd>' + A.esc(p.saison) + '</dd></div>' +
+                '<div><dt>Producteur</dt><dd>' + A.esc(C.nom) + ', ' + A.esc(C.village) + '</dd></div>' +
+              '</dl>' +
+            '</div>' +
+          '</div>';
+
+        if (!dispo) return;
+        var picker = el.querySelector("[data-picker]");
+        A.lierSelecteur(picker, maj);
+        maj(qte);
+
+        document.getElementById("btn-ajouter").addEventListener("click", function () {
+          A.ajouter(p.id, qte, true);
+        });
+      }
+
+      function maj(q) {
+        qte = q;
+        var type = A.typeClient(q);
+        var pu = p.prix[type];
+        document.getElementById("lbl-qte").textContent = q + " kg";
+        document.getElementById("total").textContent = A.fcfa(pu * q);
+        document.getElementById("lbl-pu").textContent = A.fcfa(pu) + " / kg — tarif " + A.nomType(type).toLowerCase();
+        var eco = (p.prix.menage - pu) * q;
+        document.getElementById("lbl-eco").textContent = eco > 0 ? "Vous économisez " + A.fcfa(eco) : "";
+        document.querySelectorAll("[data-row]").forEach(function (r) {
+          r.classList.toggle("is-active", r.getAttribute("data-row") === type);
+        });
+        document.getElementById("btn-wa").href = A.lienWhatsApp(
+          "Bonjour " + C.nom + ", je souhaite commander :\n• " + p.nom + " : " + q + " kg (" + A.nomType(type) + ")\n" +
+          "Prix : " + A.fcfa(pu) + "/kg — Total : " + A.fcfa(pu * q) + "\nMerci de me confirmer la disponibilité."
+        );
+      }
+
+      function autres() {
+        document.getElementById("autres").innerHTML = window.AVEC_PRODUITS
+          .filter(function (x) { return x.id !== p.id; })
+          .sort(function (a, b) { return (b.categorie === p.categorie) - (a.categorie === p.categorie); })
+          .slice(0, 4).map(A.carteProduit).join("");
+      }
+
+      rendre(); autres();
+      document.addEventListener("avec:dispo", function () { rendre(); autres(); });
+    })();
+  </script>
+</body>
+</html>

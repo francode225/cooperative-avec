@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La coopérative — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="apropos">
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">La coopérative</li></ol></nav>
+      <span class="crumbs__title">À propos de nous</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- Histoire -->
+    <section class="section">
+      <div class="wrap story">
+        <div class="story__img" id="story-img"></div>
+        <div class="story__txt">
+          <p class="head__kicker">Notre histoire</p>
+          <h1 class="head__title" id="story-title"></h1>
+          <p id="story-1"></p>
+          <p id="story-2"></p>
+          <p>Aujourd'hui, la coopérative cultive la tomate, le piment, le gombo, le manioc, l'aubergine et la banane. Grâce à ce site, elle vend directement aux familles, aux vendeuses du marché et aux grossistes, sans intermédiaire.</p>
+          <blockquote class="bigquote">
+            « Avant, on vendait bord champ au prix que le commerçant voulait. Maintenant, c'est nous qui fixons le prix ensemble. »
+            <footer>— La présidente de la coopérative</footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chiffres -->
+    <section class="section section--tint">
+      <div class="wrap">
+        <div class="head"><div><p class="head__kicker">La coopérative en quelques chiffres</p><h2 class="head__title">Ce que nous avons construit ensemble</h2></div></div>
+        <div class="figures" id="figures"></div>
+      </div>
+    </section>
+
+    <!-- Les femmes -->
+    <section class="section" id="femmes">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Celles qui font vivre la coopérative</p>
+            <h2 class="head__title">Les femmes de la coopérative</h2>
+            <p class="head__lead">Mères, cultivatrices, commerçantes : chacune apporte son savoir-faire, des semis jusqu'à la vente.</p>
+          </div>
+        </div>
+        <div class="women" id="women"></div>
+      </div>
+    </section>
+
+    <!-- Valeurs -->
+    <section class="section section--tint">
+      <div class="wrap">
+        <div class="head"><div><p class="head__kicker">Ce qui nous guide</p><h2 class="head__title">Nos engagements</h2></div></div>
+        <div class="values" id="values"></div>
+      </div>
+    </section>
+
+    <!-- Galerie -->
+    <section class="section">
+      <div class="wrap">
+        <div class="head"><div><p class="head__kicker">Au champ et au village</p><h2 class="head__title">La vie de la coopérative</h2></div></div>
+        <div class="gallery" id="gallery"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="paystrip">
+          <div>
+            <h2>Soutenez les productrices du village</h2>
+            <p>Chaque commande est payée directement à la coopérative. Une partie des bénéfices alimente la caisse d'épargne et de crédit des membres.</p>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end">
+            <a class="btn btn--lime btn--lg" href="produits.html">Voir les produits</a>
+            <a class="btn btn--wa btn--lg" id="wa-cta" target="_blank" rel="noopener"></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C, U = window.AVEC_UNSPLASH, F = window.AVEC_FEMMES;
+      var ans = new Date().getFullYear() - C.creation;
+
+      document.getElementById("story-img").innerHTML = A.img("", "femmes", U("1709207514988-e0da51dda5b9", 1000), "Une productrice de la coopérative au champ");
+      document.getElementById("story-title").textContent = "De la tontine du village à la coopérative " + C.nom.replace("Coopérative ", "");
+      document.getElementById("story-1").textContent =
+        "Tout a commencé en " + C.creation + " à " + C.village + ". Quelques femmes du village se retrouvaient chaque semaine pour épargner quelques pièces dans une caisse commune : c'était notre " + C.nomComplet + " (AVEC).";
+      document.getElementById("story-2").textContent =
+        "Avec cette épargne, elles ont acheté ensemble des semences, un motoculteur et une motopompe. Les récoltes ont grandi, et les membres aussi : nous sommes aujourd'hui " + C.membres + " productrices sur " + C.hectares + " hectares.";
+
+      document.getElementById("figures").innerHTML = [
+        [C.membres, "femmes membres"],
+        [C.hectares + " ha", "de parcelles cultivées"],
+        [ans + " ans", "d'existence"],
+        [window.AVEC_PRODUITS.length, "produits vendus en ligne"]
+      ].map(function (f) { return '<div class="figure"><b>' + f[0] + '</b><span>' + f[1] + '</span></div>'; }).join("");
+
+      document.getElementById("women").innerHTML = F.map(function (f) {
+        return '<figure class="woman"><div class="woman__photo">' + A.img(f.photoLocale, "femmes", f.photo, f.nom + ", " + f.role) + '</div>' +
+          '<figcaption><b>' + A.esc(f.nom) + '</b><span>' + A.esc(f.role) + '</span></figcaption></figure>';
+      }).join("");
+
+      document.getElementById("values").innerHTML = [
+        [A.I.leaf, "Cultiver sainement", "Compost, rotation des cultures et traitements limités. Nous mangeons nous-mêmes ce que nous vendons."],
+        [A.I.users, "Décider ensemble", "Les prix, les investissements et la répartition des gains sont votés en assemblée par toutes les membres."],
+        [A.I.shield, "Épargner pour l'avenir", "Une part de chaque vente va dans la caisse commune, qui accorde des petits crédits aux membres pour la scolarité et la santé."]
+      ].map(function (v) { return '<div class="value">' + v[0] + '<h3>' + v[1] + '</h3><p>' + v[2] + '</p></div>'; }).join("");
+
+      var galerie = ["1551791514-88ceaaa47c40", "1746014929708-fcb859fd3185", "1782973048100-15f03e42788d", "1704646355754-ee810fa808f5", "1757283961570-682154747d9c"];
+      document.getElementById("gallery").innerHTML = galerie.map(function (id, i) {
+        return A.img("", "femmes", U(id, 900), "Vie de la coopérative, photo " + (i + 1));
+      }).join("");
+
+      var wa = document.getElementById("wa-cta");
+      wa.href = A.lienWhatsApp("Bonjour " + C.nom + ", je voudrais en savoir plus sur la coopérative.");
+      wa.innerHTML = A.I.wa + " Nous écrire";
+    })();
+  </script>
+</body>
+</html>

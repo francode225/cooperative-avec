@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon panier — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="panier">
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Panier</li></ol></nav>
+      <span class="crumbs__title">Mon panier</span>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap" id="contenu"></div>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      var racine = document.getElementById("contenu");
+
+      function rendre() {
+        var d = A.detailPanier();
+        if (!d.lignes.length) {
+          racine.innerHTML = '<div class="empty"><h2>Votre panier est vide</h2>' +
+            '<p>Parcourez la récolte du moment et ajoutez les produits dont vous avez besoin.</p>' +
+            '<a class="btn btn--primary" href="produits.html">Voir les produits</a></div>';
+          return;
+        }
+
+        racine.innerHTML =
+          '<div class="cartlayout">' +
+            '<div>' +
+              '<div class="toolbar"><h1 class="head__title" style="font-size:2rem">Mon panier</h1>' +
+                '<button class="btn btn--ghost" type="button" id="vider">' + A.I.trash + ' Vider le panier</button></div>' +
+              (d.indisponibles.length ? '<div class="offnote" style="margin-bottom:16px">' + d.indisponibles.length +
+                ' produit(s) de votre panier vien(nen)t d\'être épuisé(s). Ils ne seront pas comptés dans la commande.</div>' : "") +
+              '<div class="cartlist">' + d.lignes.map(ligne).join("") + '</div>' +
+            '</div>' +
+            '<aside class="summary" aria-label="Récapitulatif">' + resume(d) + '</aside>' +
+          '</div>';
+
+        racine.querySelectorAll("[data-ligne]").forEach(function (el) {
+          var id = el.getAttribute("data-ligne");
+          var picker = el.querySelector("[data-picker]");
+          if (picker) A.lierSelecteur(picker, function (q) { majLigne(el, id, q); });
+          el.querySelector("[data-retirer]").addEventListener("click", function () { A.retirer(id); rendre(); });
+        });
+        document.getElementById("vider").addEventListener("click", function () {
+          if (confirm("Retirer tous les produits du panier ?")) { A.vider(); rendre(); }
+        });
+      }
+
+      function ligne(l) {
+        var p = l.produit;
+        return '<article class="cline' + (l.disponible ? "" : " is-off") + '" data-ligne="' + l.id + '">' +
+          '<a class="cline__img" href="produit.html?id=' + p.id + '">' + A.photoProduit(p) + '</a>' +
+          '<div class="cline__info">' +
+            '<div class="cline__top"><a class="cline__name" href="produit.html?id=' + p.id + '">' + A.esc(p.nom) + '</a>' +
+              (l.disponible ? '<span class="typebadge typebadge--' + l.type + '" data-badge>' + A.nomType(l.type) + '</span>' :
+                '<span class="dispo dispo--off" style="position:static">Indisponible</span>') + '</div>' +
+            '<span class="cline__unit" data-pu>' + A.fcfa(l.prixUnitaire) + ' / kg</span>' +
+            (l.disponible ? A.selecteur("ligne-" + l.id, l.qte, true) : "") +
+          '</div>' +
+          '<div class="cline__right">' +
+            '<span class="cline__total" data-total>' + A.fcfa(l.disponible ? l.total : 0) + '</span>' +
+            '<span class="cline__save" data-eco>' + (l.economie > 0 && l.disponible ? "−" + A.fcfa(l.economie) : "") + '</span>' +
+            '<button class="btn btn--ghost" type="button" data-retirer aria-label="Retirer ' + A.esc(p.nom) + '">' + A.I.trash + ' Retirer</button>' +
+          '</div>' +
+        '</article>';
+      }
+
+      function resume(d) {
+        return '<h2>Récapitulatif</h2>' +
+          '<div class="summary__profile"><span>Profil de la commande</span>' +
+            '<span><span class="typebadge typebadge--' + d.profil + '">' + A.nomType(d.profil) + '</span> — ' + d.poids + ' kg au total</span>' +
+            (C.livraisonOfferteGrossiste && d.profil !== "grossiste" ?
+              '<small class="muted">Livraison offerte dès ' + C.seuils.grossiste + ' kg d\'un même produit.</small>' :
+              (d.profil === "grossiste" && C.livraisonOfferteGrossiste ? '<small style="color:var(--foret);font-weight:700">Livraison offerte</small>' : "")) +
+          '</div>' +
+          '<div class="summary__row"><span>Sous-total</span><span>' + A.fcfa(d.sousTotal + d.economie) + '</span></div>' +
+          (d.economie > 0 ? '<div class="summary__row summary__row--save"><span>Remise quantité</span><span>−' + A.fcfa(d.economie) + '</span></div>' : "") +
+          '<div class="summary__row"><span>Livraison</span><span>Choisie à l\'étape suivante</span></div>' +
+          '<div class="summary__total"><span>Total produits</span><strong>' + A.fcfa(d.sousTotal) + '</strong></div>' +
+          (d.sousTotal > 0 ? '<a class="btn btn--primary btn--lg btn--block" href="commande.html">Passer la commande</a>' :
+            '<button class="btn btn--lg btn--block" disabled>Passer la commande</button>') +
+          '<a class="btn btn--wa btn--block" target="_blank" rel="noopener" href="' + A.lienWhatsApp(texteWhatsApp(d)) + '">' + A.I.wa + ' Envoyer le panier sur WhatsApp</a>' +
+          '<a class="btn btn--ghost btn--block" href="produits.html">Continuer mes achats</a>';
+      }
+
+      function texteWhatsApp(d) {
+        var t = "Bonjour " + C.nom + ", je souhaite commander :\n";
+        d.lignes.forEach(function (l) {
+          if (l.disponible) t += "• " + l.produit.nom + " : " + l.qte + " kg (" + A.nomType(l.type) + ") = " + A.fcfa(l.total) + "\n";
+        });
+        return t + "Total produits : " + A.fcfa(d.sousTotal);
+      }
+
+      // Mise à jour fine d'une ligne sans tout redessiner (garde le focus dans le champ)
+      function majLigne(el, id, q) {
+        A.modifierQte(id, q);
+        var d = A.detailPanier();
+        var l = d.lignes.filter(function (x) { return x.id === id; })[0];
+        var badge = el.querySelector("[data-badge]");
+        badge.className = "typebadge typebadge--" + l.type;
+        badge.textContent = A.nomType(l.type);
+        el.querySelector("[data-pu]").textContent = A.fcfa(l.prixUnitaire) + " / kg";
+        el.querySelector("[data-total]").textContent = A.fcfa(l.total);
+        el.querySelector("[data-eco]").textContent = l.economie > 0 ? "−" + A.fcfa(l.economie) : "";
+        racine.querySelector(".summary").innerHTML = resume(d);
+      }
+
+      rendre();
+      document.addEventListener("avec:dispo", rendre);
+    })();
+  </script>
+</body>
+</html>

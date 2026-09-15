@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coopérative AVEC — Produits vivriers du village</title>
+  <meta name="description" content="Tomates, piments, gombo, manioc, aubergines et bananes vendus directement par les productrices de la Coopérative AVEC. Commande en ligne, paiement Mobile Money.">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="accueil">
+  <header data-header></header>
+
+  <main>
+    <!-- ================= HERO ================= -->
+    <section class="hero" aria-label="Présentation">
+      <div class="tile tile--big">
+        <div class="tile__bg" id="hero-bg"></div>
+        <div class="tile__txt">
+          <h1>Légumes frais du village, vendus par celles qui les cultivent</h1>
+          <p id="hero-lead">Tomates, piments, gombo, manioc, aubergines et bananes récoltés par les femmes de la coopérative. Pour votre famille, votre étal ou votre commerce.</p>
+          <div class="hero__cta">
+            <a class="btn btn--lime btn--lg" href="produits.html">Voir les produits</a>
+            <a class="btn btn--outline btn--lg" href="a-propos.html">Découvrir la coopérative</a>
+          </div>
+          <div class="hero__stats" id="hero-stats"></div>
+        </div>
+      </div>
+      <div class="hero__grid" id="hero-tiles"></div>
+    </section>
+
+    <!-- ================= CATÉGORIES ================= -->
+    <section class="section">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Achetez vos produits vivriers en quelques clics</p>
+            <h2 class="head__title">Catégories en vedette</h2>
+          </div>
+        </div>
+        <div class="cats" id="cats"></div>
+      </div>
+    </section>
+
+    <!-- ================= TYPES DE CLIENTS ================= -->
+    <section class="section section--tint">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Plus vous achetez, moins vous payez le kilo</p>
+            <h2 class="head__title">Un prix pour chaque acheteur</h2>
+            <p class="head__lead">Choisissez votre profil au moment de commander, ou entrez simplement votre quantité : le site applique automatiquement le bon tarif.</p>
+          </div>
+        </div>
+        <div class="tiers" id="tiers"></div>
+      </div>
+    </section>
+
+    <!-- ================= PRODUITS ================= -->
+    <section class="section">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Faites le plein de produits du terroir aujourd'hui</p>
+            <h2 class="head__title">Récolte de la semaine</h2>
+          </div>
+          <a class="btn btn--outline" href="produits.html">Tous les produits</a>
+        </div>
+        <div class="grid" id="produits"></div>
+      </div>
+    </section>
+
+    <!-- ================= PAIEMENT ================= -->
+    <section class="section" style="padding-top:0">
+      <div class="wrap">
+        <div class="paystrip">
+          <div>
+            <h2>Payez avec votre Mobile Money</h2>
+            <p>Orange Money, MTN MoMo, Moov Money ou Wave : réglez votre commande depuis votre téléphone, sans vous déplacer. Vous préférez parler à quelqu'un ? Écrivez-nous sur WhatsApp.</p>
+            <div style="margin-top:22px; display:flex; gap:12px; flex-wrap:wrap">
+              <a class="btn btn--lime" href="produits.html">Commander maintenant</a>
+              <a class="btn btn--wa" id="wa-strip" target="_blank" rel="noopener"></a>
+            </div>
+          </div>
+          <div class="paystrip__logos" id="logos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ÉTAPES ================= -->
+    <section class="section section--tint">
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <p class="head__kicker">Simple, même depuis un petit téléphone</p>
+            <h2 class="head__title">Comment commander</h2>
+          </div>
+        </div>
+        <ol class="steps">
+          <li><h3>Choisissez vos produits</h3><p>Parcourez la récolte disponible. Les produits épuisés sont signalés tout de suite.</p></li>
+          <li><h3>Indiquez votre profil</h3><p>Ménage, détaillant ou grossiste : la quantité et le prix au kilo s'ajustent.</p></li>
+          <li><h3>Payez par Mobile Money</h3><p>Orange Money, MTN, Moov ou Wave. La coopérative reçoit votre commande sur WhatsApp.</p></li>
+          <li><h3>Recevez ou retirez</h3><p>Retrait au magasin du village ou livraison dans la zone et à Abidjan.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ================= COOPÉRATIVE ================= -->
+    <section class="section">
+      <div class="wrap coop">
+        <div class="coop__photos" id="coop-photos"></div>
+        <div class="coop__txt">
+          <p class="head__kicker">Qui cultive vos légumes ?</p>
+          <h2 class="head__title" id="coop-title">Les femmes de la coopérative</h2>
+          <p id="coop-lead"></p>
+          <ul class="coop__list" id="coop-list"></ul>
+          <a class="btn btn--primary" href="a-propos.html">Lire notre histoire</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C, U = window.AVEC_UNSPLASH;
+
+      document.getElementById("hero-bg").innerHTML =
+        '<img src="' + U("1734255026082-82fdc81991f0", 1600) + '" alt="" fetchpriority="high">';
+
+      document.getElementById("hero-stats").innerHTML =
+        '<div><b>' + C.membres + '</b>productrices</div>' +
+        '<div><b>' + C.hectares + ' ha</b>cultivés</div>' +
+        '<div><b>' + window.AVEC_PRODUITS.length + '</b>produits</div>';
+
+      var tuiles = [
+        { titre: "Piments", texte: "Rouges ou verts, bien forts", cat: "condiments", photo: "1776722203818-bff2665eba64", ton: "rose" },
+        { titre: "Gombo", texte: "Tendre, cueilli le matin", cat: "legumes", photo: "1558408525-1092038389ae", ton: "seve" },
+        { titre: "Manioc", texte: "Arraché sur commande", cat: "tubercules", photo: "1757283961570-682154747d9c", ton: "mais" },
+        { titre: "Bananes", texte: "Plantain et banane douce", cat: "bananes", photo: "1617631716600-6a454b430367", ton: "light" }
+      ];
+      document.getElementById("hero-tiles").innerHTML = tuiles.map(function (t) {
+        return '<div class="tile tile--' + t.ton + '">' +
+          '<div class="tile__bg"><img src="' + U(t.photo, 900) + '" alt=""></div>' +
+          '<div class="tile__txt"><h2>' + t.titre + '</h2><p>' + t.texte + '</p>' +
+          '<a class="btn btn--outline" href="produits.html?categorie=' + t.cat + '">Acheter maintenant</a></div></div>';
+      }).join("");
+
+      document.getElementById("cats").innerHTML = window.AVEC_CATEGORIES.map(function (c) {
+        var n = window.AVEC_PRODUITS.filter(function (p) { return p.categorie === c.id; }).length;
+        return '<a class="cat" href="produits.html?categorie=' + c.id + '">' +
+          '<div class="cat__disc"><img src="' + c.photo + '" alt="" loading="lazy"></div>' +
+          '<div class="cat__name">' + A.esc(c.nom) + '</div>' +
+          '<div class="cat__meta">' + n + ' produit' + (n > 1 ? "s" : "") + '</div></a>';
+      }).join("");
+
+      var tomate = A.produit("tomate");
+      var infosTiers = {
+        menage: { txt: "Pour la cuisine de la famille. Achetez juste ce qu'il vous faut, dès 1 kg.", photo: "1582284540020-8acbe03f4924" },
+        detaillant: { txt: "Pour les vendeuses du marché, les maquis et les petites boutiques.", photo: "1776722203818-bff2665eba64" },
+        grossiste: { txt: "Pour les commerçants et les restaurants. Livraison offerte.", photo: "1757281096972-10fd02b0f5ea" }
+      };
+      document.getElementById("tiers").innerHTML = A.TYPES.map(function (t) {
+        var r = A.remise(tomate, t.id);
+        return '<div class="tier tier--' + t.id + '">' +
+          '<div class="tier__who">' + t.nom + '</div>' +
+          '<div class="tier__range">' + A.plage(t.id) + '</div>' +
+          '<p class="tier__txt">' + infosTiers[t.id].txt + '</p>' +
+          '<div class="tier__deal">' + (r > 0 ? '<b>−' + r + '%</b><span>sur le prix du kilo</span>' : '<b>1 kg</b><span>minimum, prix du marché</span>') + '</div>' +
+          '<img src="' + U(infosTiers[t.id].photo, 400) + '" alt="" loading="lazy"></div>';
+      }).join("");
+
+      function rendreProduits() {
+        document.getElementById("produits").innerHTML = window.AVEC_PRODUITS.slice(0, 8).map(A.carteProduit).join("");
+      }
+      rendreProduits();
+      document.addEventListener("avec:dispo", rendreProduits);
+
+      document.getElementById("logos").innerHTML = A.logosPaiement();
+      var waStrip = document.getElementById("wa-strip");
+      waStrip.href = A.lienWhatsApp("Bonjour " + C.nom + ", je voudrais passer une commande.");
+      waStrip.innerHTML = A.I.wa + " Commander sur WhatsApp";
+
+      var F = window.AVEC_FEMMES;
+      document.getElementById("coop-photos").innerHTML = [0, 2, 1].map(function (i) {
+        return A.img(F[i].photoLocale, "femmes", F[i].photo, F[i].role);
+      }).join("");
+      document.getElementById("coop-lead").textContent =
+        "À " + C.village + ", " + C.membres + " femmes se sont regroupées en " + C.creation +
+        " pour cultiver ensemble, épargner ensemble et vendre sans intermédiaire. Chaque achat revient directement aux familles du village.";
+      document.getElementById("coop-list").innerHTML = [
+        "Récolte à la main, tri sur place, pas de produits abîmés",
+        "Prix justes, fixés ensemble par les membres",
+        "Une partie des ventes finance l'école et le centre de santé du village"
+      ].map(function (t) { return "<li>" + A.I.leaf + "<span>" + t + "</span></li>"; }).join("");
+    })();
+  </script>
+</body>
+</html>

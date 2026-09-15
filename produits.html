@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nos produits — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="produits">
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Nos produits</li></ol></nav>
+      <span class="crumbs__title">Nos produits</span>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap shop">
+      <aside class="filters" aria-label="Filtres">
+        <div>
+          <h2>Catégories</h2>
+          <div class="chips" id="chips"></div>
+        </div>
+        <div>
+          <h2>Disponibilité</h2>
+          <label class="toggle"><input type="checkbox" id="only-dispo"> Masquer les produits indisponibles</label>
+        </div>
+        <div class="summary__profile">
+          <b>Prix selon la quantité</b>
+          <span id="rappel-seuils"></span>
+        </div>
+      </aside>
+
+      <section aria-labelledby="titre-liste">
+        <div class="toolbar">
+          <div>
+            <h1 class="head__title" id="titre-liste" style="font-size:2rem">Tous les produits</h1>
+            <span class="toolbar__count" id="count"></span>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center">
+            <label for="tri" class="sr-only">Trier</label>
+            <select id="tri" class="select">
+              <option value="defaut">Tri par défaut</option>
+              <option value="prix-asc">Prix croissant</option>
+              <option value="prix-desc">Prix décroissant</option>
+              <option value="nom">Nom (A → Z)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid--3" id="liste"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      var etat = {
+        categorie: A.param("categorie") || "tout",
+        q: (A.param("q") || "").trim().toLowerCase(),
+        dispo: false,
+        tri: "defaut"
+      };
+
+      document.getElementById("rappel-seuils").innerHTML =
+        "Ménage : " + A.plage("menage") + "<br>Détaillant : " + A.plage("detaillant") + "<br>Grossiste : " + A.plage("grossiste").toLowerCase();
+
+      function sansAccent(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+
+      function rendreChips() {
+        var cats = [{ id: "tout", nom: "Tous les produits" }].concat(window.AVEC_CATEGORIES);
+        document.getElementById("chips").innerHTML = cats.map(function (c) {
+          var n = c.id === "tout" ? window.AVEC_PRODUITS.length :
+            window.AVEC_PRODUITS.filter(function (p) { return p.categorie === c.id; }).length;
+          return '<button type="button" class="chip" data-cat="' + c.id + '" aria-pressed="' + (etat.categorie === c.id) + '">' +
+            A.esc(c.nom) + '<span>' + n + '</span></button>';
+        }).join("");
+      }
+
+      function rendre() {
+        var liste = window.AVEC_PRODUITS.filter(function (p) {
+          if (etat.categorie !== "tout" && p.categorie !== etat.categorie) return false;
+          if (etat.dispo && !A.estDisponible(p.id)) return false;
+          if (etat.q && sansAccent(p.nom + " " + p.resume).indexOf(sansAccent(etat.q)) === -1) return false;
+          return true;
+        });
+        if (etat.tri === "prix-asc") liste.sort(function (a, b) { return a.prix.menage - b.prix.menage; });
+        if (etat.tri === "prix-desc") liste.sort(function (a, b) { return b.prix.menage - a.prix.menage; });
+        if (etat.tri === "nom") liste.sort(function (a, b) { return a.nom.localeCompare(b.nom, "fr"); });
+
+        var cat = A.categorie(etat.categorie);
+        document.getElementById("titre-liste").textContent =
+          etat.q ? "Résultats pour « " + A.param("q") + " »" : (cat ? cat.nom : "Tous les produits");
+        var nbDispo = liste.filter(function (p) { return A.estDisponible(p.id); }).length;
+        document.getElementById("count").textContent =
+          liste.length + " produit" + (liste.length > 1 ? "s" : "") + " — " + nbDispo + " disponible" + (nbDispo > 1 ? "s" : "");
+
+        document.getElementById("liste").innerHTML = liste.length ? liste.map(A.carteProduit).join("") :
+          '<div class="empty" style="grid-column:1/-1"><h2>Aucun produit ne correspond</h2>' +
+          '<p>Essayez un autre mot, ou demandez-nous directement si le produit arrive bientôt.</p>' +
+          '<a class="btn btn--primary" href="produits.html">Voir tous les produits</a> ' +
+          '<a class="btn btn--wa" target="_blank" rel="noopener" href="' + A.lienWhatsApp("Bonjour, avez-vous : " + (A.param("q") || "") + " ?") + '">' + A.I.wa + ' Demander sur WhatsApp</a></div>';
+      }
+
+      document.getElementById("chips").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-cat]");
+        if (!b) return;
+        etat.categorie = b.getAttribute("data-cat");
+        etat.q = "";
+        var url = etat.categorie === "tout" ? "produits.html" : "produits.html?categorie=" + etat.categorie;
+        history.replaceState(null, "", url);
+        var champ = document.getElementById("q");
+        if (champ) champ.value = "";
+        rendreChips(); rendre();
+      });
+      document.getElementById("only-dispo").addEventListener("change", function (e) { etat.dispo = e.target.checked; rendre(); });
+      document.getElementById("tri").addEventListener("change", function (e) { etat.tri = e.target.value; rendre(); });
+      document.addEventListener("avec:dispo", rendre);
+
+      rendreChips(); rendre();
+    })();
+  </script>
+</body>
+</html>

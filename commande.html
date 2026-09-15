@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commande et paiement — Coopérative AVEC</title>
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="commande" data-sans-flottant>
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li><a href="panier.html">Panier</a></li><li aria-current="page">Commande</li></ol></nav>
+      <span class="crumbs__title">Commande et paiement</span>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap" id="contenu">
+      <form class="checkout" id="form" novalidate>
+        <div>
+          <section class="panel" aria-labelledby="t1">
+            <div class="panel__head"><span class="panel__num">1</span><h2 id="t1">Vos coordonnées</h2></div>
+            <div class="fields">
+              <div class="field"><label for="nom">Nom et prénoms</label><input id="nom" name="nom" autocomplete="name" required placeholder="Ex. Kouassi Aya Marie"></div>
+              <div class="field"><label for="tel">Téléphone</label><input id="tel" name="tel" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="07 00 00 00 00"><span class="hint">10 chiffres. La coopérative vous appellera pour la livraison.</span></div>
+              <div class="field"><label for="localite">Ville ou village</label><input id="localite" name="localite" required placeholder="Ex. Yamoussoukro"></div>
+              <div class="field"><label for="adresse">Quartier ou repère <span class="muted">(facultatif)</span></label><input id="adresse" name="adresse" placeholder="Ex. Habitat, près de la pharmacie"></div>
+              <div class="field field--full"><label for="note">Précisions pour la coopérative <span class="muted">(facultatif)</span></label><textarea id="note" name="note" rows="2" placeholder="Ex. plantain bien mûr, livraison après 16 h"></textarea></div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="t2">
+            <div class="panel__head"><span class="panel__num">2</span><h2 id="t2">Livraison</h2></div>
+            <div class="options" id="livraisons"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="t3">
+            <div class="panel__head"><span class="panel__num">3</span><h2 id="t3">Paiement Mobile Money</h2></div>
+            <div class="payopts" id="paiements"></div>
+            <p class="err" id="err-paiement" style="color:var(--tomate);font-weight:700;margin-top:10px" hidden>Choisissez un moyen de paiement.</p>
+          </section>
+        </div>
+
+        <aside class="summary" id="resume" aria-label="Récapitulatif de la commande"></aside>
+      </form>
+    </div>
+  </main>
+
+  <!-- ================= MODALE DE PAIEMENT ================= -->
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-titre">
+    <div class="modal__box" id="modal-box">
+      <div class="modal__head">
+        <span class="mm" id="modal-logo"></span>
+        <div><h2 id="modal-titre"></h2><small id="modal-sous"></small></div>
+        <button class="modal__close" type="button" id="modal-fermer" aria-label="Annuler le paiement"></button>
+      </div>
+      <div class="modal__body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+
+      if (!A.detailPanier().sousTotal) {
+        document.getElementById("contenu").innerHTML = '<div class="empty"><h2>Aucun produit à commander</h2>' +
+          '<p>Ajoutez des produits disponibles à votre panier avant de passer commande.</p>' +
+          '<a class="btn btn--primary" href="produits.html">Voir les produits</a></div>';
+        return;
+      }
+
+      var OPERATEURS = {
+        orange: { nom: "Orange Money", logo: A.logoMM("orange"), classe: "orange", prefixe: "07", ussd: "#144#", ref: "OM" },
+        mtn: { nom: "MTN MoMo", logo: A.logoMM("mtn"), classe: "mtn", prefixe: "05", ussd: "*133#", ref: "MP" },
+        moov: { nom: "Moov Money", logo: A.logoMM("moov"), classe: "moov", prefixe: "01", ussd: "*155#", ref: "MV" },
+        wave: { nom: "Wave", logo: A.logoMM("wave"), classe: "wave", prefixe: "", ussd: "", ref: "WV" }
+      };
+      var waveReel = !!(C.waveLienPaiement || "").trim();
+
+      /* ---------- Livraisons ---------- */
+      document.getElementById("livraisons").innerHTML = C.livraisons.map(function (l, i) {
+        return '<label class="option"><input type="radio" name="livraison" value="' + l.id + '"' + (i === 0 ? " checked" : "") + '>' +
+          '<span class="option__txt"><b>' + A.esc(l.nom) + '</b><small>' + A.esc(l.detail) + '</small></span>' +
+          '<span class="option__price" data-prix-liv="' + l.id + '"></span></label>';
+      }).join("");
+
+      /* ---------- Moyens de paiement ---------- */
+      document.getElementById("paiements").innerHTML = Object.keys(OPERATEURS).map(function (k) {
+        var o = OPERATEURS[k];
+        var tag = k === "wave" && waveReel ? '<span class="tag tag--live">Paiement réel</span>' : '<span class="tag">Simulation</span>';
+        return '<label class="option payopt"><input type="radio" name="paiement" value="' + k + '">' +
+          '<span class="mm mm--' + o.classe + '">' + o.logo + '</span>' +
+          '<span class="option__txt"><b>' + o.nom + '</b><small>' + (k === "wave" ? (waveReel ? "Page de paiement Wave sécurisée" : "Validation dans l'application") : "Code secret sur votre téléphone") + '</small></span>' +
+          tag + '</label>';
+      }).join("");
+
+      function livraisonChoisie() {
+        var r = document.querySelector('input[name="livraison"]:checked');
+        return r ? r.value : C.livraisons[0].id;
+      }
+
+      /* ---------- Récapitulatif ---------- */
+      function rendreResume() {
+        var d = A.detailPanier(livraisonChoisie());
+        C.livraisons.forEach(function (l) {
+          var el = document.querySelector('[data-prix-liv="' + l.id + '"]');
+          var offert = C.livraisonOfferteGrossiste && d.profil === "grossiste";
+          el.innerHTML = l.prix === 0 ? "Gratuit" : (offert ? '<s class="muted">' + A.fcfa(l.prix) + '</s> Offerte' : A.fcfa(l.prix));
+        });
+        document.getElementById("resume").innerHTML =
+          '<h2>Votre commande</h2>' +
+          '<div class="summary__items">' + d.lignes.filter(function (l) { return l.disponible; }).map(function (l) {
+            return '<div class="summary__item">' + A.photoProduit(l.produit) +
+              '<div><b>' + A.esc(l.produit.nom) + '</b><small>' + l.qte + ' kg × ' + A.fcfa(l.prixUnitaire) + ' — ' + A.nomType(l.type) + '</small></div>' +
+              '<b>' + A.fcfa(l.total) + '</b></div>';
+          }).join("") + '</div>' +
+          '<div class="summary__profile"><span>Profil : <span class="typebadge typebadge--' + d.profil + '">' + A.nomType(d.profil) + '</span></span></div>' +
+          (d.economie > 0 ? '<div class="summary__row summary__row--save"><span>Remise quantité</span><span>−' + A.fcfa(d.economie) + '</span></div>' : "") +
+          '<div class="summary__row"><span>Produits</span><span>' + A.fcfa(d.sousTotal) + '</span></div>' +
+          '<div class="summary__row"><span>Livraison</span><span>' + (d.fraisLivraison ? A.fcfa(d.fraisLivraison) : "Gratuite") + '</span></div>' +
+          '<div class="summary__total"><span>Total à payer</span><strong>' + A.fcfa(d.total) + '</strong></div>' +
+          '<button class="btn btn--primary btn--lg btn--block" type="submit">' + A.I.lock + ' Payer ' + A.fcfa(d.total) + '</button>' +
+          '<p class="modal__note">Paiements Mobile Money simulés pour la démonstration' + (waveReel ? ", sauf Wave." : ".") + '</p>' +
+          '<a class="btn btn--ghost btn--block" href="panier.html">' + A.I.arrowL + ' Modifier le panier</a>';
+      }
+      document.getElementById("livraisons").addEventListener("change", rendreResume);
+      document.addEventListener("avec:dispo", rendreResume);
+      rendreResume();
+
+      /* ---------- Validation ---------- */
+      function chiffres(s) { return String(s || "").replace(/\D/g, "").replace(/^225(?=\d{10}$)/, ""); }
+      function formatTel(s) { var d = chiffres(s); return d.replace(/(\d{2})(?=\d)/g, "$1 ").trim(); }
+
+      function erreur(id, message) {
+        var champ = document.getElementById(id).closest(".field");
+        champ.classList.toggle("has-error", !!message);
+        var e = champ.querySelector(".err");
+        if (message) {
+          if (!e) { e = document.createElement("span"); e.className = "err"; champ.appendChild(e); }
+          e.textContent = message;
+        } else if (e) e.remove();
+        return !message;
+      }
+      function valider() {
+        var ok = true;
+        ok = erreur("nom", document.getElementById("nom").value.trim().length < 3 ? "Indiquez votre nom complet." : "") && ok;
+        ok = erreur("tel", chiffres(document.getElementById("tel").value).length !== 10 ? "Le numéro doit contenir 10 chiffres, ex. 07 12 34 56 78." : "") && ok;
+        ok = erreur("localite", !document.getElementById("localite").value.trim() ? "Indiquez votre ville ou village." : "") && ok;
+        var pay = document.querySelector('input[name="paiement"]:checked');
+        document.getElementById("err-paiement").hidden = !!pay;
+        if (!pay) ok = false;
+        return ok;
+      }
+
+      /* ---------- Soumission ---------- */
+      var commandeEnCours = null;
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!valider()) {
+          var premier = document.querySelector(".has-error input, .has-error textarea");
+          if (premier) premier.focus();
+          else document.getElementById("t3").scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        var d = A.detailPanier(livraisonChoisie());
+        if (d.indisponibles.length) A.toast("Des produits épuisés ont été retirés du total.", "erreur");
+        var op = document.querySelector('input[name="paiement"]:checked').value;
+        commandeEnCours = {
+          numero: A.nouveauNumero(),
+          date: new Date().toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
+          client: {
+            nom: document.getElementById("nom").value.trim(),
+            telephone: formatTel(document.getElementById("tel").value),
+            localite: document.getElementById("localite").value.trim(),
+            adresse: document.getElementById("adresse").value.trim(),
+            note: document.getElementById("note").value.trim()
+          },
+          lignes: d.lignes.filter(function (l) { return l.disponible; }).map(function (l) {
+            return { id: l.id, nom: l.produit.nom, qte: l.qte, type: l.type, prixUnitaire: l.prixUnitaire, total: l.total };
+          }),
+          profil: d.profil,
+          sousTotal: d.sousTotal,
+          economie: d.economie,
+          livraison: d.livraison.nom,
+          fraisLivraison: d.fraisLivraison,
+          total: d.total,
+          operateur: op
+        };
+        ouvrirPaiement(op);
+      });
+
+      /* ---------- Modale ---------- */
+      var modal = document.getElementById("modal");
+      var body = document.getElementById("modal-body");
+      var minuteries = [];
+      function plusTard(fn, ms) { minuteries.push(setTimeout(fn, ms)); }
+      function annulerMinuteries() { minuteries.forEach(clearTimeout); minuteries = []; }
+
+      document.getElementById("modal-fermer").innerHTML = A.I.close;
+      document.getElementById("modal-fermer").addEventListener("click", fermer);
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) fermer(); });
+      function fermer() {
+        annulerMinuteries();
+        modal.hidden = true;
+        document.body.style.overflow = "";
+      }
+
+      function ouvrirPaiement(op) {
+        var o = OPERATEURS[op];
+        document.getElementById("modal-box").className = "modal__box theme-" + o.classe;
+        document.getElementById("modal-logo").className = "mm mm--" + o.classe;
+        document.getElementById("modal-logo").innerHTML = o.logo;
+        document.getElementById("modal-titre").textContent = "Payer avec " + o.nom;
+        document.getElementById("modal-sous").textContent = "Commande " + commandeEnCours.numero;
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (op === "wave" && waveReel) etapeWaveReel(o);
+        else etapeNumero(op, o);
+      }
+
+      function montant() {
+        return '<div class="modal__amount"><small>Montant à payer</small><strong>' + A.fcfa(commandeEnCours.total) + '</strong></div>' +
+          '<p class="modal__merchant">Bénéficiaire : <b>' + A.esc(C.nom.toUpperCase()) + '</b></p>';
+      }
+
+      // Étape 1 : numéro Mobile Money
+      function etapeNumero(op, o) {
+        var tel = chiffres(commandeEnCours.client.telephone);
+        body.innerHTML = montant() +
+          '<div class="field"><label for="mm-tel">Numéro ' + o.nom + '</label>' +
+          '<input id="mm-tel" type="tel" inputmode="numeric" value="' + formatTel(tel) + '" placeholder="' + (o.prefixe || "07") + ' 00 00 00 00">' +
+          (o.prefixe ? '<span class="hint">Les numéros ' + o.nom + ' commencent par ' + o.prefixe + '.</span>' : "") + '</div>' +
+          '<button class="btn btn--pay btn--lg btn--block" type="button" id="mm-go">Payer ' + A.fcfa(commandeEnCours.total) + '</button>' +
+          '<p class="modal__note">Simulation : aucun argent ne sera débité.</p>';
+        var champ = document.getElementById("mm-tel");
+        champ.focus();
+        document.getElementById("mm-go").addEventListener("click", function () {
+          var n = chiffres(champ.value);
+          var msg = "";
+          if (n.length !== 10) msg = "Entrez un numéro à 10 chiffres.";
+          else if (o.prefixe && n.slice(0, 2) !== o.prefixe) msg = "Ce numéro n'est pas un numéro " + o.nom + " (il doit commencer par " + o.prefixe + ").";
+          if (!erreur("mm-tel", msg)) return;
+          etapeAttente(op, o, formatTel(n));
+        });
+      }
+
+      // Étape 2 : demande envoyée sur le téléphone
+      function etapeAttente(op, o, tel) {
+        body.innerHTML = montant() +
+          '<div class="spinner" aria-hidden="true"></div>' +
+          '<p class="center"><b>Demande envoyée au ' + tel + '</b><br><span class="muted">Regardez votre téléphone…</span></p>';
+        plusTard(function () {
+          if (op === "wave") etapeWaveApp(o, tel); else etapeCode(op, o, tel);
+        }, 2200);
+      }
+
+      // Étape 3a : code secret (Orange, MTN, Moov)
+      function etapeCode(op, o, tel) {
+        body.innerHTML =
+          '<div class="ussd" aria-live="polite"><b>' + o.nom + '</b><br>Vous allez payer <b>' + A.fcfa(commandeEnCours.total) + '</b> à ' +
+            A.esc(C.nom.toUpperCase()) + '.<br>Réf : ' + commandeEnCours.numero + '<br>Frais : 0 FCFA<br><br>Entrez votre code secret pour confirmer.</div>' +
+          '<div class="pin" id="pin">' + [0, 1, 2, 3].map(function (i) {
+            return '<input type="password" inputmode="numeric" maxlength="1" aria-label="Chiffre ' + (i + 1) + ' du code secret">';
+          }).join("") + '</div>' +
+          '<button class="btn btn--pay btn--lg btn--block" type="button" id="mm-valider" disabled>Valider le paiement</button>' +
+          '<p class="modal__note">Simulation : tapez 4 chiffres au choix.</p>';
+        var cases = Array.prototype.slice.call(document.querySelectorAll("#pin input"));
+        var bouton = document.getElementById("mm-valider");
+        cases[0].focus();
+        cases.forEach(function (c, i) {
+          c.addEventListener("input", function () {
+            c.value = c.value.replace(/\D/g, "").slice(-1);
+            if (c.value && cases[i + 1]) cases[i + 1].focus();
+            bouton.disabled = !cases.every(function (x) { return x.value; });
+          });
+          c.addEventListener("keydown", function (e) {
+            if (e.key === "Backspace" && !c.value && cases[i - 1]) cases[i - 1].focus();
+            if (e.key === "Enter" && !bouton.disabled) bouton.click();
+          });
+        });
+        bouton.addEventListener("click", function () { etapeTraitement(op, o, tel); });
+      }
+
+      // Étape 3b : validation dans l'application Wave (simulation)
+      function etapeWaveApp(o, tel) {
+        body.innerHTML = montant() +
+          '<div class="ussd"><b>Wave</b><br>Nouvelle demande de paiement de <b>' + A.fcfa(commandeEnCours.total) + '</b><br>de ' +
+            A.esc(C.nom.toUpperCase()) + '.<br><br>Ouvrez l\'application Wave et appuyez sur « Confirmer ».</div>' +
+          '<button class="btn btn--pay btn--lg btn--block" type="button" id="mm-valider">J\'ai confirmé dans Wave</button>';
+        document.getElementById("mm-valider").addEventListener("click", function () { etapeTraitement("wave", o, tel); });
+      }
+
+      // Étape 4 : traitement puis succès
+      function etapeTraitement(op, o, tel) {
+        body.innerHTML = '<div class="spinner" aria-hidden="true"></div><p class="center" aria-live="polite"><b>Traitement du paiement…</b><br><span class="muted">Ne fermez pas cette fenêtre.</span></p>';
+        plusTard(function () {
+          var ref = o.ref + new Date().toISOString().slice(2, 10).replace(/-/g, "") + "." + Math.floor(1000 + Math.random() * 9000) + "." + Math.random().toString(36).slice(2, 8).toUpperCase();
+          finaliser({ moyen: o.nom, statut: "Payé (simulation)", reference: ref, numero: tel, reel: false });
+        }, 2000);
+      }
+
+      // Wave : vrai lien de paiement Wave Business
+      function etapeWaveReel(o) {
+        var lien = C.waveLienPaiement.trim();
+        lien += (lien.indexOf("?") === -1 ? "?" : "&") + "amount=" + Math.round(commandeEnCours.total);
+        body.innerHTML = montant() +
+          '<div class="notice">' + A.I.shield + '<span>Vous allez ouvrir la page de paiement sécurisée Wave. <b>Scannez le QR code</b> avec l\'application Wave, ou payez directement si vous êtes sur votre téléphone. Le montant est déjà rempli.</span></div>' +
+          '<a class="btn btn--pay btn--lg btn--block" id="wave-ouvrir" href="' + A.esc(lien) + '" target="_blank" rel="noopener">Ouvrir la page de paiement Wave</a>' +
+          '<button class="btn btn--outline btn--block" type="button" id="wave-fait" disabled>J\'ai payé avec Wave</button>' +
+          '<p class="modal__note">Revenez sur cette page après le paiement pour recevoir votre reçu.</p>';
+        document.getElementById("wave-ouvrir").addEventListener("click", function () {
+          document.getElementById("wave-fait").disabled = false;
+        });
+        document.getElementById("wave-fait").addEventListener("click", function () {
+          finaliser({ moyen: "Wave", statut: "Payé via Wave — à vérifier", reference: "", numero: "", reel: true });
+        });
+      }
+
+      function finaliser(paiement) {
+        commandeEnCours.paiement = paiement;
+        commandeEnCours.notifie = false;
+        body.innerHTML = '<div class="okmark">' + A.I.check + '</div>' +
+          '<p class="center" aria-live="polite"><b style="font-size:1.3rem">Paiement ' + (paiement.reel ? "enregistré" : "réussi") + '</b><br>' +
+          '<span class="muted">' + A.fcfa(commandeEnCours.total) + (paiement.reference ? " — Réf. " + paiement.reference : "") + '</span></p>' +
+          '<p class="center muted">Préparation de votre reçu…</p>';
+        A.enregistrerCommande(commandeEnCours);
+        A.vider();
+        plusTard(function () { A.aller("confirmation.html?n=" + encodeURIComponent(commandeEnCours.numero)); }, 1800);
+      }
+    })();
+  </script>
+</body>
+</html>

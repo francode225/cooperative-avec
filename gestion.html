@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Espace gestion — Coopérative AVEC</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="gestion" data-sans-flottant>
+  <header data-header></header>
+
+  <div class="crumbs">
+    <div class="wrap crumbs__in">
+      <nav aria-label="Fil d'Ariane"><ol><li><a href="index.html">Accueil</a></li><li aria-current="page">Espace gestion</li></ol></nav>
+      <span class="crumbs__title">Espace gestion</span>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap" id="contenu"></div>
+  </main>
+
+  <footer data-footer></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      var A = window.AVEC, C = A.C;
+      var racine = document.getElementById("contenu");
+
+      function connecte() { try { return sessionStorage.getItem("avec_gestion") === "1"; } catch (e) { return false; } }
+
+      function porte() {
+        racine.innerHTML = '<div class="gate panel">' +
+          '<h1>Espace gestion</h1><p>Réservé aux responsables de la coopérative. Entrez le code d\'accès.</p>' +
+          '<form id="gate"><label class="sr-only" for="code">Code d\'accès</label>' +
+          '<input id="code" type="password" inputmode="numeric" maxlength="8" autocomplete="off">' +
+          '<button class="btn btn--primary" type="submit">Entrer</button></form>' +
+          '<p class="modal__note" style="margin-top:14px">Démonstration : le code est ' + A.esc(C.codeGestion) + '.</p></div>';
+        document.getElementById("code").focus();
+        document.getElementById("gate").addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (document.getElementById("code").value === C.codeGestion) {
+            try { sessionStorage.setItem("avec_gestion", "1"); } catch (err) {}
+            tableau();
+          } else {
+            A.toast("Code incorrect.", "erreur");
+          }
+        });
+      }
+
+      function tableau() {
+        racine.innerHTML =
+          '<div class="admin">' +
+            '<div class="livebar"><span class="pulse" aria-hidden="true"></span><b>Disponibilités en temps réel</b>' +
+              '<span style="opacity:.85">Ouvrez la boutique dans un autre onglet : chaque changement ici s\'y affiche immédiatement.</span>' +
+              '<a class="btn btn--lime" style="margin-left:auto" href="produits.html" target="_blank">Ouvrir la boutique</a></div>' +
+
+            '<section><div class="toolbar"><h1 class="head__title" style="font-size:2rem">Produits</h1><span class="toolbar__count" id="resume-dispo"></span></div>' +
+              '<div class="tablewrap"><table class="stock"><thead><tr><th>Produit</th><th>Ménage</th><th>Détaillant</th><th>Grossiste</th><th>Disponibilité</th></tr></thead><tbody id="stock"></tbody></table></div>' +
+            '</section>' +
+
+            '<section><div class="toolbar"><h2 class="head__title" style="font-size:2rem">Commandes reçues</h2>' +
+              '<button class="btn btn--ghost" type="button" id="reset">' + A.I.trash + ' Réinitialiser la démo</button></div>' +
+              '<div class="orders" id="orders"></div>' +
+            '</section>' +
+          '</div>';
+
+        rendreStock(); rendreCommandes();
+
+        document.getElementById("stock").addEventListener("change", function (e) {
+          var cb = e.target.closest("[data-dispo]");
+          if (!cb) return;
+          var p = A.produit(cb.getAttribute("data-dispo"));
+          A.changerDispo(p.id, cb.checked);
+          A.toast(p.nom + (cb.checked ? " est de nouveau disponible." : " est maintenant indisponible."), cb.checked ? "" : "erreur");
+        });
+        document.getElementById("orders").addEventListener("click", function (e) {
+          var b = e.target.closest("[data-livrer]");
+          if (!b) return;
+          A.majCommande(b.getAttribute("data-livrer"), { livree: true });
+          rendreCommandes();
+        });
+        document.getElementById("reset").addEventListener("click", function () {
+          if (!confirm("Effacer les commandes de démonstration, le panier et remettre les disponibilités par défaut ?")) return;
+          try { ["avec_commandes", "avec_dispo", "avec_panier"].forEach(function (k) { localStorage.removeItem(k); }); } catch (err) {}
+          A.majCompteurs();
+          document.dispatchEvent(new CustomEvent("avec:dispo"));
+          rendreStock(); rendreCommandes();
+        });
+      }
+
+      function rendreStock() {
+        var tbody = document.getElementById("stock");
+        if (!tbody) return;
+        var n = 0;
+        tbody.innerHTML = window.AVEC_PRODUITS.map(function (p) {
+          var d = A.estDisponible(p.id);
+          if (d) n++;
+          return '<tr><td><span class="stock__prod">' + A.photoProduit(p) + A.esc(p.nom) + '</span></td>' +
+            '<td>' + A.fcfa(p.prix.menage) + '</td><td>' + A.fcfa(p.prix.detaillant) + '</td><td>' + A.fcfa(p.prix.grossiste) + '</td>' +
+            '<td><label class="toggle"><input type="checkbox" data-dispo="' + p.id + '"' + (d ? " checked" : "") + '>' +
+            '<span class="dispo ' + (d ? "dispo--on" : "dispo--off") + '" style="position:static">' + (d ? "Disponible" : "Indisponible") + '</span></label></td></tr>';
+        }).join("");
+        document.getElementById("resume-dispo").textContent = n + " disponible(s) sur " + window.AVEC_PRODUITS.length;
+      }
+
+      function rendreCommandes() {
+        var zone = document.getElementById("orders");
+        if (!zone) return;
+        var liste = A.commandes();
+        if (!liste.length) {
+          zone.innerHTML = '<div class="empty"><h2>Aucune commande pour l\'instant</h2><p>Les commandes passées sur ce navigateur apparaissent ici.</p>' +
+            '<a class="btn btn--primary" href="produits.html">Passer une commande test</a></div>';
+          return;
+        }
+        zone.innerHTML = liste.map(function (c) {
+          return '<article class="order"><div class="order__top"><b>' + A.esc(c.numero) + '</b>' +
+              '<span class="muted">' + A.esc(c.date) + '</span>' +
+              '<span class="typebadge typebadge--' + c.profil + '">' + A.nomType(c.profil) + '</span>' +
+              '<span class="status' + (c.paiement.reel ? " status--warn" : "") + '">' + A.esc(c.paiement.moyen) + ' — ' + A.esc(c.paiement.statut) + '</span>' +
+              '<b style="margin-left:auto;color:var(--foret)">' + A.fcfa(c.total) + '</b></div>' +
+            '<div><b>' + A.esc(c.client.nom) + '</b> — ' + A.esc(c.client.telephone) + ' — ' + A.esc(c.client.localite) + ' — ' + A.esc(c.livraison) + '</div>' +
+            '<ul>' + c.lignes.map(function (l) { return '<li>' + A.esc(l.nom) + ' : ' + l.qte + ' kg (' + A.nomType(l.type) + ') — ' + A.fcfa(l.total) + '</li>'; }).join("") + '</ul>' +
+            '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+              '<a class="btn btn--wa" target="_blank" rel="noopener" href="https://wa.me/225' + String(c.client.telephone).replace(/\D/g, "") + '?text=' +
+                encodeURIComponent("Bonjour " + c.client.nom + ", ici " + C.nom + ". Votre commande " + c.numero + " est en préparation.") + '">' + A.I.wa + ' Écrire au client</a>' +
+              (c.livree ? '<span class="status">Livrée</span>' : '<button class="btn btn--soft" type="button" data-livrer="' + A.esc(c.numero) + '">Marquer comme livrée</button>') +
+            '</div></article>';
+        }).join("");
+      }
+
+      document.addEventListener("avec:dispo", rendreStock);
+      document.addEventListener("avec:commandes", rendreCommandes);
+
+      if (connecte()) tableau(); else porte();
+    })();
+  </script>
+</body>
+</html>
