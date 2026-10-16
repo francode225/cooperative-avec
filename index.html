@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Coopérative AVEC — Produits vivriers du village</title>
-  <meta name="description" content="Tomates, piments, gombo, manioc, aubergines et bananes vendus directement par les productrices de la Coopérative AVEC. Commande en ligne, paiement Mobile Money.">
+  <meta name="description" content="Tomates, piments, gombo, manioc, aubergines et bananes vendus directement par les membres de la Coopérative AVEC de Dabou. Commande en ligne, paiement Mobile Money.">
   <link rel="icon" href="assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +20,8 @@
       <div class="tile tile--big">
         <div class="tile__bg" id="hero-bg"></div>
         <div class="tile__txt">
-          <h1>Légumes frais du village, vendus par celles qui les cultivent</h1>
-          <p id="hero-lead">Tomates, piments, gombo, manioc, aubergines et bananes récoltés par les femmes de la coopérative. Pour votre famille, votre étal ou votre commerce.</p>
+          <h1>Légumes frais de Dabou, vendus par celles et ceux qui les cultivent</h1>
+          <p id="hero-lead">Tomates, piments, gombo, manioc, aubergines et bananes récoltés par les membres de la coopérative AVEC. Pour votre famille, votre étal ou votre commerce.</p>
           <div class="hero__cta">
             <a class="btn btn--lime btn--lg" href="produits.html">Voir les produits</a>
             <a class="btn btn--outline btn--lg" href="a-propos.html">Découvrir la coopérative</a>
@@ -114,7 +114,7 @@
         <div class="coop__photos" id="coop-photos"></div>
         <div class="coop__txt">
           <p class="head__kicker">Qui cultive vos légumes ?</p>
-          <h2 class="head__title" id="coop-title">Les femmes de la coopérative</h2>
+          <h2 class="head__title" id="coop-title">Les membres de la coopérative</h2>
           <p id="coop-lead"></p>
           <ul class="coop__list" id="coop-list"></ul>
           <a class="btn btn--primary" href="a-propos.html">Lire notre histoire</a>
@@ -133,10 +133,10 @@
       var A = window.AVEC, C = A.C, U = window.AVEC_UNSPLASH;
 
       document.getElementById("hero-bg").innerHTML =
-        '<img src="' + U("1734255026082-82fdc81991f0", 1600) + '" alt="" fetchpriority="high">';
+        '<img src="assets/img/femmes/hero.jpg" alt="Les productrices de la coopérative AVEC après la récolte" fetchpriority="high">';
 
       document.getElementById("hero-stats").innerHTML =
-        '<div><b>' + C.membres + '</b>productrices</div>' +
+        '<div><b>' + C.membres + '</b>membres</div>' +
         '<div><b>' + C.hectares + ' ha</b>cultivés</div>' +
         '<div><b>' + window.AVEC_PRODUITS.length + '</b>produits</div>';
 
@@ -189,16 +189,16 @@
       waStrip.innerHTML = A.I.wa + " Commander sur WhatsApp";
 
       var F = window.AVEC_FEMMES;
-      document.getElementById("coop-photos").innerHTML = [0, 2, 1].map(function (i) {
-        return A.img(F[i].photoLocale, "femmes", F[i].photo, F[i].role);
+      document.getElementById("coop-photos").innerHTML = [0, 4, 5].map(function (i) {
+        return A.img(F[i].photoLocale, "femmes", F[i].photo, F[i].legende);
       }).join("");
       document.getElementById("coop-lead").textContent =
-        "À " + C.village + ", " + C.membres + " femmes se sont regroupées en " + C.creation +
-        " pour cultiver ensemble, épargner ensemble et vendre sans intermédiaire. Chaque achat revient directement aux familles du village.";
+        "À " + C.village + ", " + C.membres + " personnes — en grande majorité des femmes — se sont regroupées en " + C.creation +
+        " pour cultiver ensemble, s'entraider et vendre sans intermédiaire. Chaque achat revient directement aux familles de la coopérative.";
       document.getElementById("coop-list").innerHTML = [
         "Récolte à la main, tri sur place, pas de produits abîmés",
         "Prix justes, fixés ensemble par les membres",
-        "Une partie des ventes finance l'école et le centre de santé du village"
+        "Une partie des ventes alimente la caisse d'entraide des membres"
       ].map(function (t) { return "<li>" + A.I.leaf + "<span>" + t + "</span></li>"; }).join("");
     })();
   </script>

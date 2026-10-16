@@ -5,18 +5,18 @@
 window.AVEC_CONFIG = {
   // --- Identité ---------------------------------------------------------
   nom: "Coopérative AVEC",
-  nomComplet: "Association Villageoise d'Épargne et de Crédit",
+  nomComplet: "Association de valorisation de l'entraide communautaire",
   slogan: "Du champ du village à votre marmite",
-  village: "N'Guessankro",
-  adresse: "Village de N'Guessankro, Sous-préfecture de Tiébissou, Côte d'Ivoire",
-  carteRecherche: "Tiébissou, Côte d'Ivoire",   // utilisé pour la carte Google Maps
-  creation: 2016,
-  membres: 48,          // nombre de femmes membres
+  village: "Dabou",
+  adresse: "Coopérative AVEC de Dabou, Côte d'Ivoire",
+  carteRecherche: "Dabou, Côte d'Ivoire",   // utilisé pour la carte Google Maps
+  creation: 2020,
+  membres: 48,          // nombre total de membres (coopérative mixte, en grande majorité des femmes)
   hectares: 35,         // surface cultivée
 
   // --- Contacts -----------------------------------------------------------
-  telephoneAffiche: "+225 05 56 89 42 12",
-  whatsapp: "2250556894212",            // format international SANS "+" ni espaces
+  telephoneAffiche: "+225 07 05 30 58 90",
+  whatsapp: "2250705305890",            // format international SANS "+" ni espaces
   email: "contact@cooperative-avec.ci",
   horaires: "Lundi – Samedi : 7h – 18h",
 
@@ -31,7 +31,7 @@ window.AVEC_CONFIG = {
   // Service gratuit CallMeBot (voir README.md pour obtenir la clé en 2 min).
   // Laisser vide = pas d'envoi automatique (le bouton WhatsApp reste disponible).
   callmebot: {
-    telephone: "+2250556894212",
+    telephone: "+2250705305890",
     apiKey: ""
   },
 
@@ -44,8 +44,8 @@ window.AVEC_CONFIG = {
 
   // --- Livraison ----------------------------------------------------------
   livraisons: [
-    { id: "retrait", nom: "Retrait à la coopérative", detail: "Au magasin du village, sous 24 h", prix: 0 },
-    { id: "local", nom: "Livraison dans la zone", detail: "Tiébissou, Yamoussoukro et environs — 24 à 48 h", prix: 1000 },
+    { id: "retrait", nom: "Retrait à la coopérative", detail: "Au siège de la coopérative à Dabou, sous 24 h", prix: 0 },
+    { id: "local", nom: "Livraison dans la zone", detail: "Dabou, Jacqueville et environs — 24 à 48 h", prix: 1000 },
     { id: "abidjan", nom: "Livraison à Abidjan", detail: "Par car de transport — 48 à 72 h", prix: 3000 }
   ],
   livraisonOfferteGrossiste: true,       // livraison gratuite si la commande contient un achat grossiste

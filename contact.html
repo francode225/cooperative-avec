@@ -67,7 +67,7 @@
         '<a class="ccard" href="' + A.lienWhatsApp("Bonjour " + C.nom + " !") + '" target="_blank" rel="noopener"><span class="ccard__ico" style="background:#25d366;color:#fff">' + A.I.wa + '</span><span><b>WhatsApp</b><span>' + A.esc(C.telephoneAffiche) + '</span></span></a>' +
         '<a class="ccard" href="tel:+' + C.whatsapp + '"><span class="ccard__ico">' + A.I.tel + '</span><span><b>Téléphone</b><span>' + A.esc(C.telephoneAffiche) + '</span></span></a>' +
         '<a class="ccard" href="mailto:' + A.esc(C.email) + '"><span class="ccard__ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span><b>E-mail</b><span>' + A.esc(C.email) + '</span></span></a>' +
-        '<div class="ccard"><span class="ccard__ico">' + A.I.pin + '</span><span><b>Magasin de la coopérative</b><span>' + A.esc(C.adresse) + '<br>' + A.esc(C.horaires) + '</span></span></div>';
+        '<div class="ccard"><span class="ccard__ico">' + A.I.pin + '</span><span><b>Coopérative AVEC de Dabou</b><span>' + A.esc(C.adresse) + '<br>' + A.esc(C.horaires) + '</span></span></div>';
 
       document.getElementById("map").src = "https://maps.google.com/maps?q=" + encodeURIComponent(C.carteRecherche) + "&z=12&output=embed";
       document.getElementById("envoyer").innerHTML = A.I.wa + " Envoyer sur WhatsApp";

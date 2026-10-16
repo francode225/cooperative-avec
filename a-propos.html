@@ -52,9 +52,9 @@
       <div class="wrap">
         <div class="head">
           <div>
-            <p class="head__kicker">Celles qui font vivre la coopérative</p>
-            <h2 class="head__title">Les femmes de la coopérative</h2>
-            <p class="head__lead">Mères, cultivatrices, commerçantes : chacune apporte son savoir-faire, des semis jusqu'à la vente.</p>
+            <p class="head__kicker">Celles et ceux qui font vivre la coopérative</p>
+            <h2 class="head__title">Les membres de la coopérative</h2>
+            <p class="head__lead">La coopérative est mixte, avec une grande majorité de femmes. Chacune et chacun apporte son savoir-faire, des semis jusqu'à la vente.</p>
           </div>
         </div>
         <div class="women" id="women"></div>
@@ -81,8 +81,8 @@
       <div class="wrap">
         <div class="paystrip">
           <div>
-            <h2>Soutenez les productrices du village</h2>
-            <p>Chaque commande est payée directement à la coopérative. Une partie des bénéfices alimente la caisse d'épargne et de crédit des membres.</p>
+            <h2>Soutenez les producteurs de Dabou</h2>
+            <p>Chaque commande est payée directement à la coopérative. Une partie des bénéfices alimente la caisse d'entraide des membres.</p>
           </div>
           <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end">
             <a class="btn btn--lime btn--lg" href="produits.html">Voir les produits</a>
@@ -103,34 +103,35 @@
       var A = window.AVEC, C = A.C, U = window.AVEC_UNSPLASH, F = window.AVEC_FEMMES;
       var ans = new Date().getFullYear() - C.creation;
 
-      document.getElementById("story-img").innerHTML = A.img("", "femmes", U("1709207514988-e0da51dda5b9", 1000), "Une productrice de la coopérative au champ");
-      document.getElementById("story-title").textContent = "De la tontine du village à la coopérative " + C.nom.replace("Coopérative ", "");
+      document.getElementById("story-img").innerHTML = A.img("histoire.jpg", "femmes", "", "Deux productrices de la coopérative après l'arrachage du manioc");
+      document.getElementById("story-title").textContent = "De l'entraide entre voisines à la coopérative " + C.nom.replace("Coopérative ", "");
       document.getElementById("story-1").textContent =
-        "Tout a commencé en " + C.creation + " à " + C.village + ". Quelques femmes du village se retrouvaient chaque semaine pour épargner quelques pièces dans une caisse commune : c'était notre " + C.nomComplet + " (AVEC).";
+        "Tout a commencé en " + C.creation + " à " + C.village + ". Quelques productrices se retrouvaient chaque semaine pour s'entraider aux champs et mettre un peu d'argent en commun. De là est née l'AVEC, notre " + C.nomComplet + ".";
       document.getElementById("story-2").textContent =
-        "Avec cette épargne, elles ont acheté ensemble des semences, un motoculteur et une motopompe. Les récoltes ont grandi, et les membres aussi : nous sommes aujourd'hui " + C.membres + " productrices sur " + C.hectares + " hectares.";
+        "Avec cette caisse commune, le groupe a acheté des semences, des outils et une motopompe. Les récoltes ont grandi, et le groupe aussi : nous sommes aujourd'hui " + C.membres + " membres — des femmes pour la grande majorité, et quelques hommes — sur " + C.hectares + " hectares.";
 
       document.getElementById("figures").innerHTML = [
-        [C.membres, "femmes membres"],
+        [C.membres, "membres, en majorité des femmes"],
         [C.hectares + " ha", "de parcelles cultivées"],
         [ans + " ans", "d'existence"],
         [window.AVEC_PRODUITS.length, "produits vendus en ligne"]
       ].map(function (f) { return '<div class="figure"><b>' + f[0] + '</b><span>' + f[1] + '</span></div>'; }).join("");
 
       document.getElementById("women").innerHTML = F.map(function (f) {
-        return '<figure class="woman"><div class="woman__photo">' + A.img(f.photoLocale, "femmes", f.photo, f.nom + ", " + f.role) + '</div>' +
-          '<figcaption><b>' + A.esc(f.nom) + '</b><span>' + A.esc(f.role) + '</span></figcaption></figure>';
+        var titre = f.nom || f.legende;
+        var sous = f.nom ? f.role : "";
+        return '<figure class="woman"><div class="woman__photo">' + A.img(f.photoLocale, "femmes", f.photo, titre) + '</div>' +
+          '<figcaption><b>' + A.esc(titre) + '</b>' + (sous ? '<span>' + A.esc(sous) + '</span>' : "") + '</figcaption></figure>';
       }).join("");
 
       document.getElementById("values").innerHTML = [
         [A.I.leaf, "Cultiver sainement", "Compost, rotation des cultures et traitements limités. Nous mangeons nous-mêmes ce que nous vendons."],
-        [A.I.users, "Décider ensemble", "Les prix, les investissements et la répartition des gains sont votés en assemblée par toutes les membres."],
-        [A.I.shield, "Épargner pour l'avenir", "Une part de chaque vente va dans la caisse commune, qui accorde des petits crédits aux membres pour la scolarité et la santé."]
+        [A.I.users, "Décider ensemble", "Les prix, les investissements et la répartition des gains sont votés en assemblée par tous les membres."],
+        [A.I.shield, "Épargner pour l'avenir", "Une part de chaque vente va dans la caisse d'entraide, qui dépanne les membres pour la scolarité, la santé ou la prochaine campagne."]
       ].map(function (v) { return '<div class="value">' + v[0] + '<h3>' + v[1] + '</h3><p>' + v[2] + '</p></div>'; }).join("");
 
-      var galerie = ["1551791514-88ceaaa47c40", "1746014929708-fcb859fd3185", "1782973048100-15f03e42788d", "1704646355754-ee810fa808f5", "1757283961570-682154747d9c"];
-      document.getElementById("gallery").innerHTML = galerie.map(function (id, i) {
-        return A.img("", "femmes", U(id, 900), "Vie de la coopérative, photo " + (i + 1));
+      document.getElementById("gallery").innerHTML = window.AVEC_GALERIE.map(function (g) {
+        return A.img(g.photoLocale, "femmes", "", g.alt);
       }).join("");
 
       var wa = document.getElementById("wa-cta");

@@ -360,13 +360,13 @@
       '<div class="footer__band"><div class="wrap footer__grid">' +
         '<div class="footer__col footer__about">' +
           '<img class="footer__logo" src="assets/img/logo.png" alt="' + esc(C.nom) + '">' +
-          '<p>' + esc(C.nomComplet) + ' de ' + esc(C.village) + '. ' + C.membres + ' productrices qui cultivent et vendent ensemble depuis ' + C.creation + '.</p>' +
+          '<p>' + esc(C.nomComplet) + ' de ' + esc(C.village) + '. ' + C.membres + ' membres, en grande majorité des femmes, qui cultivent et vendent ensemble depuis ' + C.creation + '.</p>' +
         '</div>' +
         '<div class="footer__col"><h3>Boutique</h3>' +
           CATS.map(function (c) { return '<a href="produits.html?categorie=' + c.id + '">' + esc(c.nom) + '</a>'; }).join("") +
         '</div>' +
         '<div class="footer__col"><h3>La coopérative</h3>' +
-          '<a href="a-propos.html">Notre histoire</a><a href="a-propos.html#femmes">Les productrices</a><a href="contact.html">Nous contacter</a><a href="gestion.html">Espace gestion</a>' +
+          '<a href="a-propos.html">Notre histoire</a><a href="a-propos.html#femmes">Les membres</a><a href="contact.html">Nous contacter</a><a href="gestion.html">Espace gestion</a>' +
         '</div>' +
         '<div class="footer__col"><h3>Contact</h3>' +
           '<p class="footer__line">' + I.pin + esc(C.adresse) + '</p>' +

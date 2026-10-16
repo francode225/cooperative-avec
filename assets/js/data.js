@@ -149,14 +149,23 @@
     }
   ];
 
-  // Photos de l'équipe (page À propos). Déposez vos photos dans assets/img/femmes/
-  // puis écrivez leur nom dans photoLocale (ex. "femme-1.jpg"). Modifiez noms et rôles ici.
+  /* Photos des femmes de la coopérative (page À propos et accueil).
+     Les fichiers sont dans assets/img/femmes/.
+     Quand vous connaîtrez les noms, remplissez "nom" et "role" : ils s'afficheront
+     sous la photo à la place de la légende. */
   window.AVEC_FEMMES = [
-    { photoLocale: "", photo: U("1509100194014-d49809396daa", 700), nom: "Nom de la présidente", role: "Présidente" },
-    { photoLocale: "", photo: U("1509099381441-ea3c0cf98b94", 700), nom: "Nom de la secrétaire", role: "Secrétaire générale" },
-    { photoLocale: "", photo: U("1761370980657-22586ea44093", 700), nom: "Nom de la trésorière", role: "Trésorière" },
-    { photoLocale: "", photo: U("1509099342178-e323b1717dba", 700), nom: "Nom du membre", role: "Responsable des cultures" },
-    { photoLocale: "", photo: U("1553775927-a071d5a6a39a", 700), nom: "Nom du membre", role: "Responsable des ventes" },
-    { photoLocale: "", photo: U("1708417145375-ed79c7131fab", 700), nom: "Groupe des productrices", role: "Équipe des champs" }
+    { photoLocale: "femme-1.jpg", nom: "", role: "", legende: "La récolte du jour : tomates, gombo et aubergines" },
+    { photoLocale: "femme-2.jpg", nom: "", role: "", legende: "Les prix et les commandes se décident ensemble" },
+    { photoLocale: "femme-3.jpg", nom: "", role: "", legende: "Toute la coopérative après la récolte du soir" },
+    { photoLocale: "femme-4.jpg", nom: "", role: "", legende: "Contrôle des plants avant la cueillette" },
+    { photoLocale: "femme-5.jpg", nom: "", role: "", legende: "Les commandes arrivent maintenant par téléphone" },
+    { photoLocale: "femme-6.jpg", nom: "", role: "", legende: "Les membres de la coopérative, houe à la main" }
+  ];
+
+  // Galerie « La vie de la coopérative » (page À propos)
+  window.AVEC_GALERIE = [
+    { photoLocale: "galerie-1.jpg", alt: "Les productrices présentent la récolte de légumes" },
+    { photoLocale: "galerie-2.jpg", alt: "Travail dans le champ de manioc" },
+    { photoLocale: "galerie-3.jpg", alt: "Préparation d'une commande au milieu des plants de tomate" }
   ];
 })();

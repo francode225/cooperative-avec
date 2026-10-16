@@ -36,7 +36,7 @@ Tout se trouve dans **`assets/js/config.js`** :
 |---|---|
 | `nom`, `village`, `adresse`, `creation`, `membres`, `hectares` | Informations de la coopérative (affichées partout) |
 | `telephoneAffiche` | Numéro affiché, ex. `"+225 05 56 89 42 12"` |
-| `whatsapp` | Numéro WhatsApp du vendeur **sans + ni espaces**, ex. `"2250556894212"` |
+| `whatsapp` | Numéro WhatsApp du vendeur **sans + ni espaces**, ex. `"2250705305890"` |
 | `waveLienPaiement` | Votre lien Wave Business (voir section 5) |
 | `callmebot` | Notification WhatsApp automatique (voir section 4) |
 | `seuils` | Quantités minimales : ménage 1 kg, détaillant 10 kg, grossiste 50 kg |
@@ -58,7 +58,7 @@ Le site utilise **CallMeBot**, un service gratuit qui envoie un message WhatsApp
 4. Dans `assets/js/config.js`, remplissez :
    ```js
    callmebot: {
-     telephone: "+2250556894212",   // votre numéro, avec +225
+     telephone: "+2250705305890",   // votre numéro, avec +225
      apiKey: "123456"               // la clé reçue
    },
    ```
